@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PKC Companion</title>
+    <style>
+        :root {
+            --primary-color: #5a7fff;
+            --secondary-color: #4a6ae5;
+            --background-color: #f0f2f5;
+            --text-color: #333;
+            --error-color: #ff4d4d;
+        }
+        #pkc-sidebar {
+            all: initial;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            width: 100%;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-color);
+        }
+        #pkc-sidebar .section {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        #pkc-sidebar h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        #pkc-sidebar h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: var(--secondary-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        #pkc-sidebar select, #pkc-sidebar input, #pkc-sidebar button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background-color: var(--background-color);
+        }
+        #pkc-sidebar select:focus, #pkc-sidebar input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary-color);
+        }
+        #pkc-sidebar button {
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        #pkc-sidebar button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(90, 127, 255, 0.3);
+        }
+        #pkc-sidebar button:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        #pkc-sidebar #memo-list {
+            margin-top: 15px;
+        }
+        #pkc-sidebar .memo-item {
+            background-color: #f5f5f5;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        #pkc-sidebar .memo-item:hover {
+            transform: translateX(3px);
+            box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+        }
+        #pkc-sidebar #summary-content {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+        #pkc-sidebar #summary-content:hover {
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+        #pkc-sidebar .activity-tag {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        #pkc-sidebar .activity-tag.research { background-color: #ffcccb; color: #8b0000; }
+        #pkc-sidebar .activity-tag.learning { background-color: #90ee90; color: #006400; }
+        #pkc-sidebar .activity-tag.planning { background-color: #add8e6; color: #00008b; }
+        #pkc-sidebar #activity-progress {
+            width: 100%;
+            height: 6px;
+            background-color: #e0e0e0;
+            margin-top: 15px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        #pkc-sidebar #activity-progress-bar {
+            width: 0;
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.5s ease-in-out;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(90, 127, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(90, 127, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(90, 127, 255, 0); }
+        }
+        #pkc-sidebar #start-button:not(:disabled) {
+            animation: pulse 2s infinite;
+        }
+        #pkc-sidebar .info-box {
+            background-color: #e6f3ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.4;
+            border-radius: 0 8px 8px 0;
+        }
+        #pkc-sidebar #activity-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        #pkc-sidebar .stat-item {
+            text-align: center;
+            flex: 1;
+            background-color: var(--background-color);
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        #pkc-sidebar .stat-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #pkc-sidebar .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        #pkc-sidebar .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+        #pkc-sidebar #error-message {
+            background-color: var(--error-color);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        #pkc-sidebar #reconnect-button {
+            background-color: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+    <div id="pkc-sidebar">
+        <div id="error-message">
+            Extension disconnected. <button id="reconnect-button">Reconnect</button>
+        </div>
+        <div class="section" id="activity-section">
+            <h2>PKC Companion <span id="current-activity-tag" class="activity-tag"></span></h2>
+            <div class="info-box">
+                Track your research, learning, and planning activities with ease. Start an activity to begin capturing insights!
+            </div>
+            <select id="activity-select">
+                <option value="">Select an activity</option>
+                <option value="research">Research</option>
+                <option value="learning">Learning</option>
+                <option value="planning">Planning</option>
+            </select>
+            <button id="start-button">Start Activity</button>
+            <button id="end-activity-button" disabled>End Activity</button>
+            <div id="activity-progress">
+                <div id="activity-progress-bar"></div>
+            </div>
+            <div id="activity-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="pages-visited">0</div>
+                    <div class="stat-label">Pages Visited</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="memos-added">0</div>
+                    <div class="stat-label">Memos Added</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="time-spent">0:00</div>
+                    <div class="stat-label">Time Spent</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section" id="summary-section">
+            <h3>Page Summary</h3>
+            <div id="summary-content">No summary available yet. Start an activity to generate summaries.</div>
+        </div>
+        
+        <div class="section" id="memo-section">
+            <h3>Memos</h3>
+            <input type="text" id="memo-input" placeholder="Enter a memo...">
+            <button id="add-memo-button">Add Memo</button>
+            <div id="memo-list"></div>
+        </div>
+        
+        <div id="important-context-section" class="section">
+            <h3>Important Context</h3>
+            <div id="important-context"></div>
+            <input type="text" id="context-memo-input" placeholder="Add a memo to this context">
+            <button id="add-context-memo-button">Add Memo</button>
+        </div>
+        
+        <div class="section" id="report-section">
+            <h3>Activity Report</h3>
+            <button id="view-report-button">View Final Report</button>
+            <div class="info-box">
+                The final report will include an overall summary of your activity, key insights, and connections between the pages you've visited.
+            </div>
+        </div>
+    </div>
+    <script src="sidebar.js"></script>
+</body>
+</html>
